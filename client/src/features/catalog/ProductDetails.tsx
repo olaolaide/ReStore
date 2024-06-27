@@ -1,33 +1,45 @@
 ﻿import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from "@mui/material";
+import agent from "../../app/api/agent";
+import NotFound from "../../app/errors/NotFound.tsx";
+import LoadingComponent from "../../app/layout/LoadingComponent.tsx";
 
+interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    pictureUrl: string;
+    type: string;
+    brand: string;
+    quantityInStock: number;
+}
 
 function ProductDetails() {
-    const {id} = useParams()
-
+    const {id} = useParams<{ id: string }>();
     const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/Products/${id}`)
-            .then(res => setProduct(res.data))
-            .catch(error => console.error(error))
-            .finally(() => setLoading(false))
+        agent.Catalog.details(Number(id))
+            .then((response) => setProduct(response))
+            .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <h3>Loading...</h3>
-    if (!product) return <h3>Product not found</h3>
+    if (loading) return <LoadingComponent message='Loading Product...'/>;
+    if (!product) return <NotFound/>;
+
     return (
         <Grid container spacing={6}>
             <Grid item xs={6}>
                 <img src={product.pictureUrl} alt={product.name} style={{width: '100%'}}/>
             </Grid>
             <Grid item xs={6}>
-                <Typography variant='h3'>{product.name}</Typography>
+                <Typography variant="h3">{product.name}</Typography>
                 <Divider sx={{mb: 2}}/>
-                <Typography variant='h4' color='secondary'>${(product.price / 100).toFixed(2)}</Typography>
-
+                <Typography variant="h4" color="secondary">${(product.price / 100).toFixed(2)}</Typography>
                 <TableContainer>
                     <Table>
                         <TableBody>

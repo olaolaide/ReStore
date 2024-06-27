@@ -1,36 +1,29 @@
-﻿import {Button} from "@mui/material";
-import ProductList from "./ProductList.tsx";
-import {useEffect, useState} from "react";
+﻿import ProductList from "./ProductList.tsx";
+import { useEffect, useState } from "react";
+import agent from "../../app/api/agent.ts";
+import LoadingComponent from "../../app/layout/LoadingComponent.tsx";
 
 function Catalog() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true); // Initialize loading state
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/products')
-            .then(res => res.json())
-            .then(data => setProducts(data));
+        agent.Catalog.list()
+            .then(products => {
+                setProducts(products);
+                setLoading(false); // Set loading to false once data is fetched
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                setLoading(false); // Ensure loading state is set to false on error as well
+            });
     }, []);
 
-    const addProduct = () => {
-        setProducts(prevState => [
-            ...prevState,
-            {
-                id: prevState.length + 1,
-                name: 'product' + (prevState.length + 1),
-                description: 'Some description',
-                price: (prevState.length * 100) + 100,
-                pictureUrl: 'http://example.com/picture.jpg',
-                type: 'Some type',
-                brand: 'Some brand',
-                quantityInStock: 100
-            }
-        ]);
-    };
+    if (loading) return <LoadingComponent message='Loading Product...'/>; // Display loading component while fetching data
 
     return (
         <>
-            <ProductList products={products}/>
-            <Button variant='contained' onClick={addProduct}>Add Product</Button>
+            <ProductList products={products} />
         </>
     );
 }
