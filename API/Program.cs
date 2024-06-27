@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
