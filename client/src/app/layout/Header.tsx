@@ -1,6 +1,7 @@
 ﻿import { AppBar, Badge, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { ShoppingCart } from "@mui/icons-material";
+import { useStoreContext } from "../context/StoreContext.tsx";
 
 const midLinks = [
     { title: 'catalog', path: '/catalog' },
@@ -19,6 +20,11 @@ interface Props {
 }
 
 function Header({ handleThemeChange, darkMode }: Props) {
+    const { basket } = useStoreContext();
+
+    // Compute the total count of items in the basket
+    const basketCount = basket ? basket.items.reduce((acc, item) => acc + item.quantity, 0) : 0;
+
     const navLinkStyle = {
         color: 'inherit',
         typography: 'h6',
@@ -55,8 +61,9 @@ function Header({ handleThemeChange, darkMode }: Props) {
                         </ListItem>
                     ))}
                 </List>
-                <IconButton size="large" edge="start" color="inherit" sx={{ ml: 'auto', mr: 2 }}>
-                    <Badge badgeContent="4" color="secondary">
+                <IconButton component={Link} to='/basket' size="large" edge="start" color="inherit"
+                            sx={{ ml: 'auto', mr: 2 }}>
+                    <Badge badgeContent={basketCount} color="secondary">
                         <ShoppingCart />
                     </Badge>
                 </IconButton>

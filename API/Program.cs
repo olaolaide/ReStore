@@ -20,9 +20,13 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3001")
             .AllowAnyMethod()
+            .AllowCredentials()
             .AllowAnyHeader();
     });
 });
+
+// Add AutoMapper services
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();

@@ -1,11 +1,11 @@
-﻿import axios, { AxiosError, AxiosResponse } from "axios";
-import { toast } from "react-toastify";
-import { router } from "../router/Routes";
+﻿import axios, {AxiosError, AxiosResponse} from "axios";
+import {toast} from "react-toastify";
+import {router} from "../router/Routes";
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
 axios.defaults.baseURL = 'http://localhost:5000/api/';
-
+axios.defaults.withCredentials = true;
 const responseBody = (response: AxiosResponse) => response.data;
 
 axios.interceptors.response.use(
@@ -15,7 +15,7 @@ axios.interceptors.response.use(
     },
     (error: AxiosError) => {
         console.error('Caught by interceptor');
-        const { data, status } = error.response as AxiosResponse;
+        const {data, status} = error.response as AxiosResponse;
 
         switch (status) {
             case 400:
@@ -38,7 +38,7 @@ axios.interceptors.response.use(
                 router.navigate('/not-found');
                 break;
             case 500:
-                router.navigate('/server-error', { state: { error: data } });
+                router.navigate('/server-error', {state: {error: data}});
                 break;
             default:
                 toast.error('An unexpected error occurred');
@@ -69,9 +69,16 @@ const testErrors = {
     getValidationError: () => requests.get('error/validation-error'),
 };
 
+const Basket = {
+    get: () => requests.get('basket'),
+    addItem: (productId: number, quantity = 1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
+};
+
 const agent = {
     Catalog,
     testErrors,
+    Basket
 };
 
 export default agent;
